@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.soundinch7.ui.LibraryViewModel
-import com.example.soundinch7.ui.components.PlaylistBottomSheet
 import com.example.soundinch7.ui.components.PlaylistCard
 import com.example.soundinch7.ui.models.Playlist
 import com.example.soundinch7.ui.theme.SoundInch7Theme
@@ -91,14 +90,7 @@ fun LibraryScreen(viewModel : LibraryViewModel = viewModel(),
             }
         }
     }// end of scaffold
-    selectedPlaylist?.let { playlist ->
-        PlaylistBottomSheet(
-            playlist = playlist,
-            onDismiss = { selectedPlaylist = null },
-            onToggleFavorite = { viewModel.toggleFavorite(it) },
-            onDelete = { viewModel.deletePlaylist(it) }
-        )
-    }
+
 
 }
 
