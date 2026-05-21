@@ -5,10 +5,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.soundinch7.ui.UserSessionViewModel
 import com.example.soundinch7.ui.components.BottomNavigationBar
 import com.example.soundinch7.ui.navigation.SoundInRoutes
@@ -18,7 +20,7 @@ fun MainScreen(
     sessionViewModel: UserSessionViewModel,
     onLogout: () -> Unit,
 
-){
+    ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -28,12 +30,12 @@ fun MainScreen(
             BottomNavigationBar(
                 currentRoute = currentRoute,
                 onNavigate = { route ->
-                    navController.navigate(route){
-                        popUpTo (navController.graph.startDestinationId){
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }
                         launchSingleTop = true
-                        restoreState =true
+                        restoreState = true
                     }
                 }
             )
@@ -45,12 +47,27 @@ fun MainScreen(
             modifier = Modifier.padding(paddingValues)
         ) // end of nav host arguments
         {
-            composable(SoundInRoutes.LIBRARY) {LibraryScreen() }
-            composable(SoundInRoutes.SEARCH) {SearchScreen()}
-            composable (SoundInRoutes.PROFILE) {ProfileScreen(
-                sessionViewModel = sessionViewModel,
-                onLogout = onLogout
-            )}
+            composable(SoundInRoutes.LIBRARY) {
+                LibraryScreen(
+                    onNavigateToPlaylistDetail = { playlist ->
+                        navController.navigate("playlistDetail/${playlist.id}")
+                    }
+                )
+            }
+            composable(SoundInRoutes.SEARCH) { SearchScreen() }
+            composable(SoundInRoutes.PROFILE) {
+                ProfileScreen(
+                    sessionViewModel = sessionViewModel,
+                    onLogout = onLogout
+                )
+            }
+            composable(
+                route = SoundInRoutes.PLAYLIST_DETAIL,
+                arguments = listOf(navArgument("playlistId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val playlistId = backStackEntry.arguments?.getInt("playlistId")
+                PlaylistDetailScreen()
+            }
         }   // end of nav host
     } // end Scaffold
 }

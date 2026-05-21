@@ -34,4 +34,17 @@ class LibraryViewModel : ViewModel() {
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
+    fun toggleFavorite(playlist: Playlist) {
+        PlaylistRepository.toogleFavourite(playlist)
+    }
+    fun deletePlaylist(playlist: Playlist) {
+        PlaylistRepository.deletePlaylist(playlist)
+    }
+
+
+    //
+    fun onTabSelected(index: Int) {
+        _selectedTab.value = index
+    }
 }

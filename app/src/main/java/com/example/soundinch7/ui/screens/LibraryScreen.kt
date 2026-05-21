@@ -16,23 +16,32 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.soundinch7.ui.LibraryViewModel
+import com.example.soundinch7.ui.components.PlaylistBottomSheet
 import com.example.soundinch7.ui.components.PlaylistCard
+import com.example.soundinch7.ui.models.Playlist
+import com.example.soundinch7.ui.theme.SoundInch7Theme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(viewModel : LibraryViewModel = viewModel(),
-
+    onNavigateToPlaylistDetail: (Playlist)-> Unit
 
 ){
     // get playlist from the view model using collectAsStateWithLifecycle to observe changes
     val filteredPlaylist by viewModel.filteredPlaylist.collectAsStateWithLifecycle()
+    val playlist by viewModel.playlist.collectAsStateWithLifecycle()
+    var selectedPlaylist by remember { mutableStateOf<Playlist?>(null) }
 
     Scaffold(
         topBar = {
@@ -75,11 +84,30 @@ fun LibraryScreen(viewModel : LibraryViewModel = viewModel(),
                 items(filteredPlaylist, key = {it.id}){ playlist ->
                     PlaylistCard(
                         playlist = playlist,
-                        onClick = {  }
+                        onClick = { onNavigateToPlaylistDetail(playlist) },
+                        onLongClick = {selectedPlaylist = playlist}
                     )
                 }
             }
         }
+    }// end of scaffold
+    selectedPlaylist?.let { playlist ->
+        PlaylistBottomSheet(
+            playlist = playlist,
+            onDismiss = { selectedPlaylist = null },
+            onToggleFavorite = { viewModel.toggleFavorite(it) },
+            onDelete = { viewModel.deletePlaylist(it) }
+        )
     }
+
 }
 
+@Preview(showBackground = true)
+@Composable
+fun LibraryScreenPreview() {
+    SoundInch7Theme() {
+        LibraryScreen(
+            onNavigateToPlaylistDetail = {}
+        )
+    }
+}
